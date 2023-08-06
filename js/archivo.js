@@ -45,12 +45,12 @@ form.onsubmit = (event) => {
 
   form.reset();
 
-  mostrarEmpleados();
+  mostrarEmpleados(empleados);
 };
 
 //funcion
-const mostrarEmpleados = () => {
-  // Borramos el html para poner el array actualizado
+const mostrarEmpleados = (empleados) => {
+// Borramos el html para poner el array actualizado
   contenedorEmpleados.innerHTML = " ";
 
   empleados.forEach((empleado, index) => {
@@ -104,7 +104,7 @@ const mostrarEmpleados = () => {
 const eliminarEmpleado = (index) => {
   empleados = empleados.filter((empleado) => empleado.id !== empleados[index].id);
 
-  mostrarEmpleados();
+  mostrarEmpleados(empleados);
 };
 
 //funcion
@@ -122,5 +122,18 @@ const editarEmpleado = (index) => {
 //function
 const pagarSueldo = (index, pagoInput) => {
   empleados[index].depositarSueldo(parseFloat(pagoInput.value));
-  mostrarEmpleados();
+  mostrarEmpleados(empleados);
+};
+
+//Busqueda y filtrado de usuario
+
+buscar.oninput = (event) => {
+  console.log(event.target.value);
+
+  if (event.target === " ") {
+    mostrarEmpleados(empleados);
+  } else {
+    let empleadosfiltrados = empleados.filter(empleado => empleado.nombre.toLowerCase().includes(event.target.value))
+    mostrarEmpleados(empleadosfiltrados)
+  }
 };
