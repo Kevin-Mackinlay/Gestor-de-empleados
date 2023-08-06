@@ -16,25 +16,44 @@ class Empleado {
     this.edad = edad;
     this.sueldo = 0;
   }
+  //metodo
+  depositarSueldo(monto) {
+    this.sueldo += monto;
+  }
 }
 
+//variables
 let empleados = [];
 let empleadoEditar;
+let modoEdicion = false;
 
 form.onsubmit = (event) => {
   // Prevenimos el comportamiento por defecto que tienen los formularios de recargarse la página
   event.preventDefault();
-  empleados.push(new Empleado(nombre.value, puesto.value, edad.value));
+
+  if (modoEdicion) {
+    //Editar el empleado
+    let index = empleados.findIndex((empleado) => empleado.id === empleadoEditar.id);
+    empleados[index].nombre = nombre.value;
+    empleados[index].puesto = puesto.value;
+    empleados[index].edad = edad.value;
+    btn.value = "Agregar";
+    modoEdicion = false;
+  } else {
+    empleados.push(new Empleado(nombre.value, puesto.value, edad.value));
+  }
+
   form.reset();
+
   mostrarEmpleados();
 };
 
+//funcion
 const mostrarEmpleados = () => {
   // Borramos el html para poner el array actualizado
   contenedorEmpleados.innerHTML = " ";
 
   empleados.forEach((empleado, index) => {
-
     // console.log(`el empleado ${empleado.nombre} esta en la posicion del array ${index} `);
     let tarjetaEmpleado = document.createElement("div");
     tarjetaEmpleado.classList.add("mt-2", "border", "border-2", "p-3", "shadow", "shadow-md");
@@ -56,33 +75,52 @@ const mostrarEmpleados = () => {
     //agregamos boton de editar
 
     let btnEditar = document.createElement("button");
-    btnEditar.classList.add("btn", "btn-info", "ms-2" );
+    btnEditar.classList.add("btn", "btn-info", "ms-2");
     btnEditar.innerHTML = "Editar";
     tarjetaEmpleado.appendChild(btnEditar);
 
     let btnPagar = document.createElement("button");
-    btnPagar.classList.add("btn", "btn-success", "ms-2" );
+    btnPagar.classList.add("btn", "btn-success", "ms-2");
     btnPagar.innerHTML = "Pagar";
     tarjetaEmpleado.appendChild(btnPagar);
 
     btnEliminar.onclick = () => eliminarEmpleado(index);
-  });
 
-  
- 
+    btnEditar.onclick = () => editarEmpleado(index);
+
+    btnPagar.onclick = () => {
+      let pagoInput = document.createElement("Input");
+      pagoInput.classList.add("form-control", "mt-2");
+      pagoInput.type = "number";
+      pagoInput.placeholder = "Ingrese el monto a pagar y presione el boton";
+      tarjetaEmpleado.appendChild(pagoInput);
+      //recursividad
+      btnPagar.onclick = () => pagarSueldo(index, pagoInput);
+    };
+  });
 };
 
+//funcion
 const eliminarEmpleado = (index) => {
-    empleados = empleados.filter(empleado => empleado.id !== empleados[index].id );
+  empleados = empleados.filter((empleado) => empleado.id !== empleados[index].id);
 
-    mostrarEmpleados();
-}
+  mostrarEmpleados();
+};
 
+//funcion
 const editarEmpleado = (index) => {
-    empleadoEditar = empleados(index);
-    nombre.value = empleadoEditar.nombre;
-    puesto.value = empleadoEditar.puesto;
-    edad.value = empleadoEditar.edad;
-    
-    btn.value = "Editar"
-}
+  empleadoEditar = empleados[index];
+
+  nombre.value = empleadoEditar.nombre;
+  puesto.value = empleadoEditar.puesto;
+  edad.value = empleadoEditar.edad;
+
+  modoEdicion = true;
+  btn.value = "Editar";
+};
+
+//function
+const pagarSueldo = (index, pagoInput) => {
+  empleados[index].depositarSueldo(parseFloat(pagoInput.value));
+  mostrarEmpleados();
+};
